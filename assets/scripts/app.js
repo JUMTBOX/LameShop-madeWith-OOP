@@ -8,12 +8,21 @@ class Product {
 }
 
 class Cart {
-  item = [];
+  items = [];
   constructor() {}
 
+  set cartItem(val) {
+    this.items = val;
+    this.totalOutput.innerHTML = `<h2>\$ ${this.totalAmount.toFixed(2)}</h2>`;
+  }
+  get totalAmount() {
+    const sum = this.items.reduce((acc, cur) => acc + cur.price, 0);
+    return sum;
+  }
   addProduct(prod) {
-    this.item.push(prod);
-    this.totalOutput.innerHTML = `<h2>\$ ${1}</h2>`;
+    const updatedItems = [...this.items];
+    updatedItems.push(prod);
+    this.cartItem = updatedItems;
   }
   render() {
     const cartEl = document.createElement("section");
