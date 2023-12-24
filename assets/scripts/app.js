@@ -1,48 +1,13 @@
-class Product {
-  constructor(title, imgUrl, price, description) {
-    this.title = title;
-    this.imgUrl = imgUrl;
-    this.price = price;
-    this.description = description;
-  }
-}
-
-/**각 클래스 내 render메서드의 공통된 부분을 상속으로 제공하기 위한 클래스*/
-class Component {
-  constructor(renderHookId, shouldRender = true) {
-    this.hookId = renderHookId;
-    shouldRender && this.render();
-  }
-  /**상속받는 클래스에서 오버라이드하는 메서드*/
-  render() {}
-  /**인자(생성할 DOM의 태그명 , css를 붙이기 위한 클래스명 , 추가할 속성명)*/
-  createRootElement(tag, cssClasses, attributes) {
-    const rootElement = document.createElement(tag);
-    if (cssClasses) rootElement.className = cssClasses;
-    if (attributes && attributes.length > 0) {
-      for (let attr of attributes) {
-        rootElement.setAttribute(attr.name, attr.value);
-      }
-    }
-
-    document.querySelector(this.hookId).append(rootElement);
-    return rootElement;
-  }
-}
-
-/**createRootElement메서드에 인자로 들어가는 attribute를 생성하기 위한 클래스 */
-class ElementAttribute {
-  constructor(attrName, attrVal) {
-    this.name = attrName;
-    this.value = attrVal;
-  }
-}
-
 class Cart extends Component {
   items = [];
 
   constructor(renderHookId) {
-    super(renderHookId);
+    super(renderHookId, false);
+    this.orderProduct = () => {
+      console.log("주문중...");
+      console.log(this.items);
+    };
+    this.render();
   }
   /**setter */
   set cartItem(val) {
@@ -59,12 +24,15 @@ class Cart extends Component {
     updatedItems.push(prod);
     this.cartItem = updatedItems;
   }
+
   render() {
     const cartEl = this.createRootElement("section", "cart");
     cartEl.innerHTML = `
         <h2>\$ ${0}</h2>
         <button>주문하기</button>
     `;
+    const orderBtn = cartEl.querySelector("button");
+    orderBtn.addEventListener("click", this.orderProduct);
     this.totalOutput = cartEl.querySelector("h2");
     return cartEl;
   }
@@ -98,14 +66,15 @@ class ProductItem extends Component {
 }
 
 class ProductList extends Component {
-  products = [];
+  #products = [];
   constructor(renderHookId) {
-    super(renderHookId);
+    super(renderHookId, false);
+    this.render();
     this.fetchProducts();
   }
 
   fetchProducts() {
-    this.products = [
+    this.#products = [
       new Product(
         "이불",
         "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcR49ldl9foL0v8SgbVJsejg3wAKna1Ho52eDVPXgGDo1Wb7ntPhGQp8zlHo2FHcXZm0W8txTDwFE4_ATRbLn4LuLd7gHJl0L6hXV33hKyRLnVLMeowZaYEv&usqp=CAc",
@@ -123,7 +92,7 @@ class ProductList extends Component {
   }
 
   renderProducts() {
-    for (const prod of this.products) {
+    for (const prod of this.#products) {
       new ProductItem(prod, "#product-list");
     }
   }
@@ -132,7 +101,7 @@ class ProductList extends Component {
     this.createRootElement("ul", "product-list", [
       new ElementAttribute("id", "product-list"),
     ]);
-    if (this.products && this.products.length > 0) this.renderProducts();
+    if (this.#products && this.#products.length > 0) this.renderProducts();
   }
 }
 
