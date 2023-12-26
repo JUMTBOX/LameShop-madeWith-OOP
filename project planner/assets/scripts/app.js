@@ -9,6 +9,8 @@ class DOMHelper {
     const element = document.getElementById(elementId);
     const destination = document.querySelector(newDestinationSelector);
     destination.append(element);
+    /**요소가 움직이면 자동으로 해당 요소쪽으로 스크롤 */
+    element.scrollIntoView({ behavior: "smooth" });
   }
 }
 
@@ -37,8 +39,8 @@ class Component {
 
 //-----------------------------------------------------------------------------
 class Tooltip extends Component {
-  constructor(closeNotifierFunc, text) {
-    super("active-projects", true);
+  constructor(closeNotifierFunc, text, hostElementId) {
+    super(hostElementId);
     this.closeNotifier = closeNotifierFunc;
     this.text = text;
     this.create();
@@ -51,7 +53,23 @@ class Tooltip extends Component {
   create() {
     const toolTipEl = document.createElement("div");
     toolTipEl.className = "card";
-    toolTipEl.textContent = this.text;
+    const toolTipTemplate = document.getElementById("tooltip");
+    const toolTipBody = document.importNode(toolTipTemplate.content, true);
+    toolTipBody.querySelector("p").textContent = this.text;
+    toolTipEl.append(toolTipBody);
+
+    const hostElPosLeft = this.hostElement.offsetLeft;
+    const hostElPosTop = this.hostElement.offsetTop;
+    const hostElHeight = this.hostElement.clientHeight;
+    const parentElScrolling = this.hostElement.parentElement.scrollTop;
+
+    const x = hostElPosLeft + 20;
+    const y = hostElPosTop + hostElHeight - parentElScrolling - 10;
+
+    toolTipEl.style.position = "absolute";
+    toolTipEl.style.left = `${x}px`;
+    toolTipEl.style.top = `${y}px`;
+
     toolTipEl.addEventListener("click", this.closeToolTipHandler);
     this.element = toolTipEl;
   }
@@ -74,7 +92,8 @@ class ProjectItem {
     const toolTipText = projectElement.dataset.extraInfo;
     const toolTip = new Tooltip(
       () => (this.hasActiveTooltip = false),
-      toolTipText
+      toolTipText,
+      this.id
     );
     toolTip.attach();
     this.hasActiveTooltip = true;
@@ -147,6 +166,15 @@ class App {
     finishedProject.setSwitchHandlerFunc(
       activeProject.addProject.bind(activeProject)
     );
+
+    setTimeout(this.startAnalytics, 3000);
+  }
+
+  static startAnalytics() {
+    const analyticsScript = document.createElement("script");
+    analyticsScript.src = "assets/scripts/analytics.js";
+    analyticsScript.defer = true;
+    document.head.append(analyticsScript);
   }
 }
 
