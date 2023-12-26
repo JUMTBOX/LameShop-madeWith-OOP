@@ -29,7 +29,7 @@ class Component {
 
   attach() {
     this.hostElement.insertAdjacentElement(
-      this.insertBefore ? "afterbegin" : "beforeend",
+      this.insertBefore ? "beforebegin" : "beforeend",
       this.element
     );
   }
@@ -37,9 +37,10 @@ class Component {
 
 //-----------------------------------------------------------------------------
 class Tooltip extends Component {
-  constructor(closeNotifierFunc) {
+  constructor(closeNotifierFunc, text) {
     super("active-projects", true);
     this.closeNotifier = closeNotifierFunc;
+    this.text = text;
     this.create();
   }
 
@@ -50,7 +51,7 @@ class Tooltip extends Component {
   create() {
     const toolTipEl = document.createElement("div");
     toolTipEl.className = "card";
-    toolTipEl.textContent = "DUMMY TEXT!!!";
+    toolTipEl.textContent = this.text;
     toolTipEl.addEventListener("click", this.closeToolTipHandler);
     this.element = toolTipEl;
   }
@@ -70,8 +71,11 @@ class ProjectItem {
   showMoreInfoHandler() {
     if (this.hasActiveTooltip) return;
     const projectElement = document.getElementById(this.id);
-    console.log("데이터셋", projectElement.dataset);
-    const toolTip = new Tooltip(() => (this.hasActiveTooltip = false));
+    const toolTipText = projectElement.dataset.extraInfo;
+    const toolTip = new Tooltip(
+      () => (this.hasActiveTooltip = false),
+      toolTipText
+    );
     toolTip.attach();
     this.hasActiveTooltip = true;
   }
@@ -81,7 +85,7 @@ class ProjectItem {
     const moreInfoBtn = projectItemElement.querySelector(
       "button:first-of-type"
     );
-    moreInfoBtn.addEventListener("click", this.showMoreInfoHandler);
+    moreInfoBtn.addEventListener("click", this.showMoreInfoHandler.bind(this));
   }
 
   connectSwitchButton(type) {
