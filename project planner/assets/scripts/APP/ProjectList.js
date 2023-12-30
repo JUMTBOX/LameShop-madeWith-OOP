@@ -18,7 +18,32 @@ export class ProjectsList {
         )
       );
     }
+    this.connectDroppable();
   }
+
+  connectDroppable() {
+    const list = document.querySelector(`#${this.projectType}-projects ul`);
+
+    list.addEventListener("dragenter", (e) => {
+      if (e.dataTransfer.types[0] === "text/plain") {
+        list.parentElement.classList.add("droppable");
+        e.preventDefault();
+      }
+    });
+    list.addEventListener("dragover", (e) => {
+      if (e.dataTransfer.types[0] === "text/plain") {
+        e.preventDefault();
+      }
+    });
+    list.addEventListener("dragleave", (e) => {
+      if (
+        e.relatedTarget.closest(`#${this.projectType}-projects ul`) !== list
+      ) {
+        list.parentElement.classList.remove("droppable");
+      }
+    });
+  }
+
   setSwitchHandlerFunc(switchHandlerFunc) {
     this.switchHandler = switchHandlerFunc;
   }
