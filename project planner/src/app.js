@@ -1,4 +1,4 @@
-import { ProjectsList } from "./APP/ProjectList.js";
+import { ProjectsList } from "./APP/ProjectList";
 
 class App {
   static init() {

@@ -1,10 +1,11 @@
-import { DOMHelper } from "../Utility/DomHelper.js";
-import { ProjectItem } from "./ProjectItem.js";
+import { DOMHelper } from "../Utility/DomHelper";
+import { ProjectItem } from "./ProjectItem";
 
 export class ProjectsList {
-  projects = [];
+  // projects = [];
   constructor(projectType) {
     this.projectType = projectType;
+    this.projects = [];
     const projectItems = document.querySelectorAll(
       `#${projectType}-projects li`
     );

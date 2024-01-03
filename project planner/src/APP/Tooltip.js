@@ -5,13 +5,12 @@ export class Tooltip extends Component {
     super(hostElementId);
     this.closeNotifier = closeNotifierFunc;
     this.text = text;
+    this.closeToolTipHandler = () => {
+      this.detach();
+      this.closeNotifier();
+    };
     this.create();
   }
-
-  closeToolTipHandler = () => {
-    this.detach();
-    this.closeNotifier();
-  };
   create() {
     const toolTipEl = document.createElement("div");
     toolTipEl.className = "card";
